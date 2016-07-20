@@ -2,7 +2,7 @@ package main
 
 import (
     "fmt"
-    mfcore "https://github.com/drasko/go-mainflux-core-server"
+    mfcore "github.com/drasko/go-mainflux-core-server"
 )
 
 func main() {
