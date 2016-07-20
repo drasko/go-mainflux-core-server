@@ -4,6 +4,14 @@
 
 Mainflux Core Microservice for Mainflux IoT Platform.
 
+### Usage
+Use [main.go](examples/main.go) example - just place it in any dir and then:
+```
+go get
+go build
+./go-mainflux-core-server
+```
+
 ### Documentation
 Development documentation can be found on our [Mainflux GitHub Wiki](https://github.com/Mainflux/mainflux/wiki).
 
