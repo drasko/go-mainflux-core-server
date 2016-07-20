@@ -1,4 +1,4 @@
-package main
+package mainfluxcore
 
 import(
     "encoding/json"
@@ -22,60 +22,16 @@ type MainfluxMessage struct {
 type MongoConn struct {
     session *mgo.Session
     dColl *mgo.Collection
-    sColl *mgo.Collection
+    cColl *mgo.Collection
 }
 
 var mc MongoConn
 
-type Device struct {
-    DeviceId string   `json: "deviceId"`
-    DeviceName string `json: "deviceName"`
-    DeviceType string `json: "deviceType"`
-}
-
-type Stream struct {
-
-}
-
-/** == Functions == */
-/**
- * createDevice ()
- */
-func createDevice(d Device) string {
-    fmt.Println("function f parameter:", d)
-
-    // Insert Datas
-    err := mc.dColl.Insert(d)
-	if err != nil {
-		panic(err)
-	}
-
-    return "Created Device req.deviceId"
-}
-
-/**
- * getDevices()
- */
-func getDevices(req Device) string {
-    fmt.Println("function g parameter:", req)
-
-    result := []Device{}
-    err := mc.dColl.Find(nil).All(&result)
-    if err != nil {
-        log.Fatal(err)
-    }
-
-    b, err := json.Marshal(result)
-    if err != nil {
-        fmt.Println("error:", err)
-    }
-    return string(b)
-}
 
 /**
  * main()
  */
-func main() {
+func ServerStart() {
 
     /** Callback map */
     fncMap := map[string]func(Device) string {
@@ -96,20 +52,20 @@ func main() {
     mgoSession.SetMode(mgo.Monotonic, true)
 
     deviceMongo := mgoSession.DB("test").C("devices")
-    streamMongo := mgoSession.DB("test").C("streams")
+    channelMongo := mgoSession.DB("test").C("channels")
 
     /** Set-up globals */
     mc.session = mgoSession
     mc.dColl = deviceMongo
-    mc.sColl = streamMongo
+    mc.cColl = channelMongo
 
     /**
      * NATS
      */
     nc, err := nats.Connect(nats.DefaultURL)
-	if err != nil {
-		log.Fatalf("Can't connect: %v\n", err)
-	}
+	  if err != nil {
+		  log.Fatalf("Can't connect: %v\n", err)
+	  }
 
     // Replying
     nc.Subscribe("core_in", func(msg *nats.Msg) {
