@@ -8,8 +8,8 @@ Mainflux Core Microservice for Mainflux IoT Platform.
 Use [main.go](examples/main.go) example - just place it in any dir and then:
 ```
 go get
-go build
-./go-mainflux-core-server
+go build -o mfcore
+./mfcore
 ```
 
 ### Documentation
