@@ -1,4 +1,4 @@
-package mainfluxcore
+package main
 
 import(
     "encoding/json"

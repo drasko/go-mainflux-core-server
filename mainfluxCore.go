@@ -1,4 +1,4 @@
-package mainfluxcore
+package main
 
 import(
     "encoding/json"
@@ -31,7 +31,7 @@ var mc MongoConn
 /**
  * main()
  */
-func ServerStart() {
+func main() {
 
     /** Callback map */
     fncMap := map[string]func(Device) string {
