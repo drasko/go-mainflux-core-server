@@ -86,17 +86,18 @@ func main() {
         // Select method from lookup table
         //f := fncMap[mfMsg.Method]
 
+        var res string
         switch mfMsg.Method {
             case "createDevice":
-                res := createDevice(mfMsg.Body)
+                res = createDevice(mfMsg.Body)
             case "getDevices":
-                res := getDevices()
+                res = getDevices()
             case "getDevice":
-                res := getDevice(mfMsg.Id)
+                res = getDevice(mfMsg.Id)
             case "updateDevice":
-                res := updateDevice(mfMsg.Id, mfMsg.Body)
+                res = updateDevice(mfMsg.Id, mfMsg.Body)
             case "deleteDevice":
-                res := deleteDevice(mfMsg.Id)
+                res = deleteDevice(mfMsg.Id)
             default:
                 fmt.Println("error: Unknown method!")
         }

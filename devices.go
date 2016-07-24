@@ -7,7 +7,7 @@ import(
 
     "github.com/satori/go.uuid"
     "gopkg.in/mgo.v2/bson"
-        "github.com/xeipuuv/gojsonschema"
+    "github.com/xeipuuv/gojsonschema"
 )
 
 type Device struct {
@@ -49,12 +49,12 @@ func createDevice(b map[string]interface{}) string {
     uuid := uuid.NewV4()
     fmt.Println(uuid.String())
 
-    //d["id"] = uuid.String()
+    d.Id = uuid.String()
 
     // Insert Device
-    err := mc.dColl.Insert(d)
-	if err != nil {
-		panic(err)
+    erri := mc.dColl.Insert(d)
+	if erri != nil {
+		panic(erri)
 	}
 
     return "Created Device req.deviceId"
@@ -70,11 +70,11 @@ func getDevices() string {
         log.Fatal(err)
     }
 
-    b, err := json.Marshal(results)
+    r, err := json.Marshal(results)
     if err != nil {
         fmt.Println("error:", err)
     }
-    return string(b)
+    return string(r)
 }
 
 /**
@@ -87,11 +87,11 @@ func getDevice(id string) string {
         log.Fatal(err)
     }
 
-    b, err := json.Marshal(result)
+    r, err := json.Marshal(result)
     if err != nil {
         fmt.Println("error:", err)
     }
-    return string(b)
+    return string(r)
 }
 
 /**
@@ -105,11 +105,11 @@ func updateDevice(id string, b map[string]interface{}) string {
         log.Fatal(err)
     }
 
-    b, err := json.Marshal(err.Error())
-    if err != nil {
-        fmt.Println("error:", err)
+    r, errm := json.Marshal(err.Error())
+    if errm != nil {
+        fmt.Println("error:", errm)
     }
-    return string(b)
+    return string(r)
 }
 
 /**
@@ -121,9 +121,9 @@ func deleteDevice(id string) string {
         log.Fatal(err)
     }
 
-    b, err := json.Marshal(err.Error())
+    r, err := json.Marshal([]byte("Deleted"))
     if err != nil {
         fmt.Println("error:", err)
     }
-    return string(b)
+    return string(r)
 }
