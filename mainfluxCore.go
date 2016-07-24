@@ -13,7 +13,8 @@ import(
 
 type MainfluxMessage struct {
     Method string `json: "method"`
-    Body Device `json: "body"`
+    Id string `json: "id"`
+    Body map[string]interface{} `json: "body"`
 }
 
 /**
@@ -34,10 +35,10 @@ var mc MongoConn
 func main() {
 
     /** Callback map */
-    fncMap := map[string]func(Device) string {
-        "createDevice": createDevice,
-        "getDevices": getDevices,
-    }
+    //fncMap := map[string]func(map[string]interface{}) string {
+    //    "createDevice": createDevice,
+    //    "getDevices": getDevices,
+    //}
 
     /**
      * MongoDB
@@ -63,9 +64,9 @@ func main() {
      * NATS
      */
     nc, err := nats.Connect(nats.DefaultURL)
-	  if err != nil {
-		  log.Fatalf("Can't connect: %v\n", err)
-	  }
+	if err != nil {
+        log.Fatalf("Can't connect: %v\n", err)
+	}
 
     // Replying
     nc.Subscribe("core_in", func(msg *nats.Msg) {
@@ -73,26 +74,53 @@ func main() {
 
         log.Println(msg.Subject, string(msg.Data))
 
+        // Unmarshal the message recieved from NATS
         err := json.Unmarshal(msg.Data, &mfMsg)
         if err != nil {
-		    fmt.Println("error:", err)
-	    }
+		      fmt.Println("error:", err)
+        }
 
         fmt.Println(mfMsg)
         fmt.Printf("%+v", mfMsg)
 
-        f := fncMap[mfMsg.Method]
-        res := f(mfMsg.Body)
+        // Select method from lookup table
+        //f := fncMap[mfMsg.Method]
+
+        switch mfMsg.Method {
+            case "createDevice":
+                res := createDevice(mfMsg.Body)
+            case "getDevices":
+                res := getDevices()
+            case "getDevice":
+                res := getDevice(mfMsg.Id)
+            case "updateDevice":
+                res := updateDevice(mfMsg.Id, mfMsg.Body)
+            case "deleteDevice":
+                res := deleteDevice(mfMsg.Id)
+            default:
+                fmt.Println("error: Unknown method!")
+        }
+
+
+        // Initialize the Device param to the method
+        //var d Device
+        //d.Id = mfMsg.Body["id"].(string)
+        //d.Name = mfMsg.Body["name"].(string)
+
+        //println(d.Id, d.Name)
+
+        // Call the method
+        //res := f(mfMsg.Body)
         fmt.Println(res)
-        //nc.Publish(msg.Reply, []byte(res))
+        nc.Publish(msg.Reply, []byte(res))
     })
 
-	log.Println("Listening on 'core_in'")
+	  log.Println("Listening on 'core_in'")
 
     fmt.Println(banner)
 
     /** Keep mainf() runnig */
-	runtime.Goexit()
+	  runtime.Goexit()
 }
 
 var banner = `
