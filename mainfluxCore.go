@@ -7,7 +7,6 @@ import(
     "runtime"
     "github.com/nats-io/nats"
     "gopkg.in/mgo.v2"
-    //"gopkg.in/mgo.v2/bson"
 )
 
 
@@ -28,18 +27,10 @@ type MongoConn struct {
 
 var mc MongoConn
 
-
 /**
  * main()
  */
 func main() {
-
-    /** Callback map */
-    //fncMap := map[string]func(map[string]interface{}) string {
-    //    "createDevice": createDevice,
-    //    "getDevices": getDevices,
-    //}
-
     /**
      * MongoDB
      */
@@ -68,7 +59,7 @@ func main() {
         log.Fatalf("Can't connect: %v\n", err)
 	}
 
-    // Replying
+    // Req-Reply
     nc.Subscribe("core_in", func(msg *nats.Msg) {
         var mfMsg MainfluxMessage
 
@@ -81,13 +72,11 @@ func main() {
         }
 
         fmt.Println(mfMsg)
-        fmt.Printf("%+v", mfMsg)
-
-        // Select method from lookup table
-        //f := fncMap[mfMsg.Method]
 
         var res string
         switch mfMsg.Method {
+            case "getStatus":
+                res = getStatus()
             case "createDevice":
                 res = createDevice(mfMsg.Body)
             case "getDevices":
@@ -102,26 +91,16 @@ func main() {
                 fmt.Println("error: Unknown method!")
         }
 
-
-        // Initialize the Device param to the method
-        //var d Device
-        //d.Id = mfMsg.Body["id"].(string)
-        //d.Name = mfMsg.Body["name"].(string)
-
-        //println(d.Id, d.Name)
-
-        // Call the method
-        //res := f(mfMsg.Body)
         fmt.Println(res)
         nc.Publish(msg.Reply, []byte(res))
     })
 
-	  log.Println("Listening on 'core_in'")
+	log.Println("Listening on 'core_in'")
 
     fmt.Println(banner)
 
     /** Keep mainf() runnig */
-	  runtime.Goexit()
+	runtime.Goexit()
 }
 
 var banner = `
